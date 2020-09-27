@@ -20,7 +20,7 @@ namespace Blog.Core.Controllers
     /// </summary>
     [Route("api/[controller]/[action]")]
     [ApiController]
-    [Authorize(Permissions.Name)]
+    [Authorize("Admin")]
     public class UserController : ControllerBase
     {
         private readonly IUnitOfWork _unitOfWork;
@@ -99,10 +99,32 @@ namespace Blog.Core.Controllers
         // GET: api/User/5
         [HttpGet("{id}")]
         [AllowAnonymous]
-        public string Get(string id)
+        public async Task<MessageModel<sysUserInfo>> Get(string id)
         {
-            _logger.LogError("test wrong");
-            return "value";
+            var data=new MessageModel<sysUserInfo>();
+            if (string.IsNullOrEmpty(id))
+            {
+                data.success = false;
+                data.msg = "用户Id不能为空";
+                data.status = 404;
+                return data;
+            }
+
+            var user = await _sysUserInfoServices.QueryById(id);
+            if (user==null)
+            {
+                data.success = false;
+                data.msg = $"不存在Id={id}的用户！";
+                data.status = 404;
+                return data;
+            }
+
+            data.success = true;
+            data.msg = "获取成功！";
+            data.status = 200;
+            data.response = user;
+
+            return data;
         }
 
         // GET: api/User/5
