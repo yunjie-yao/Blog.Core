@@ -20,7 +20,7 @@ namespace Blog.Core.Controllers
     /// </summary>
     [Route("api/[controller]/[action]")]
     [ApiController]
-    [Authorize("Admin")]
+    [Authorize(Policy = "Admin")]
     public class UserController : ControllerBase
     {
         private readonly IUnitOfWork _unitOfWork;
@@ -111,7 +111,7 @@ namespace Blog.Core.Controllers
             }
 
             var user = await _sysUserInfoServices.QueryById(id);
-            if (user==null)
+            if (user==null || user.tdIsDelete)
             {
                 data.success = false;
                 data.msg = $"不存在Id={id}的用户！";

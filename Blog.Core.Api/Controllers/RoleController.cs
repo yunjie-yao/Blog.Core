@@ -56,9 +56,30 @@ namespace Blog.Core.Controllers
 
         // GET: api/User/5
         [HttpGet("{id}")]
-        public string Get(string id)
+        public async Task<MessageModel<Role>> Get(string id)
         {
-            return "value";
+            var data=new MessageModel<Role>();
+            if (string.IsNullOrEmpty(id)||string.IsNullOrWhiteSpace(id))
+            {
+                data.success = false;
+                data.status = 400;
+                data.msg = "角色Id不能为空！";
+                return data;
+            }
+
+            var role = await _roleServices.QueryById(id);
+            if (role==null)
+            {
+                data.success = false;
+                data.status = 404;
+                data.msg = $"未找到指定Id={id}的Role！";
+                return data;
+            }
+
+            data.success = true;
+            data.status = 200;
+            data.msg = "获取成功！";
+            return data;
         }
 
         /// <summary>
